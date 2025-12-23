@@ -18,6 +18,12 @@ export class MessageLog extends Phaser.GameObjects.Container {
     const newText = new Phaser.GameObjects.Text(this.scene, 10, this.height - 20, text, { fontSize: '14px', fontFamily: "Arial", color: "#000000", fontStyle: 'bold' })
     this.add(newText)
     this.messages.push(newText)
+    this.scene.time.delayedCall(5000, () => {
+      const index = this.messages.indexOf(newText)
+      this.messages.splice(index, 1);
+      newText.destroy()
+      this.shiftMessages()
+    })
     this.shiftMessages()
   }
 
@@ -27,7 +33,8 @@ export class MessageLog extends Phaser.GameObjects.Container {
       oldest.destroy()
     }
     this.messages.forEach((msg, index) => {
-      msg.y = this.height - 20 - (index * 20)
+      const reverseIndex = this.messages.length - 1 - index
+      msg.y = this.height - 20 - (reverseIndex * 20)
     })
   }
 }

@@ -43,7 +43,7 @@ export class NPC extends Phaser.GameObjects.Sprite {
   }
 
   createAnimations() {
-    if (!this.scene.anims.exists(this.sprite)) {
+    if (!this.scene.anims.exists('slime-idle-down')) {
       this.scene.anims.create({
         key: 'slime-idle-down',
         frames: this.scene.anims.generateFrameNumbers('slime-idle', { start: 0, end: 5 }),
