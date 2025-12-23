@@ -2,6 +2,7 @@ import { Item } from "./items.js"
 import { NPC } from "./entities/NPC.js"
 import { Player } from "./entities/Player.js"
 import { GameScene } from "./scenes/GameScene.js"
+import { MessageLog } from "./ui/MessageLog.js"
 
 export class GameMap {
   /**
@@ -68,13 +69,16 @@ export class GameMap {
   /**
    * @param {number} amount
    * @param {GameScene} game
+   * @param {Player|NPC} attacker
+   * @param {MessageLog} messageLog
   */
-  receiveAttack(coords, amount, game) {
+  receiveAttack(coords, amount, game, attacker, messageLog) {
     for (let i = 0; i < coords.length; i++) {
       /** @type {Player|NPC}*/
       const attacked = this.getEntityAt(coords[i].x, coords[i].y)
       if (attacked && typeof attacked?.takeDamage === 'function') {
         attacked.takeDamage(amount, game)
+        messageLog.addMessage(`${attacker.name} attacked ${attacked?.name} for ${amount} damage!`)
       }
     }
   }

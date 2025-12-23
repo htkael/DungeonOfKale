@@ -163,26 +163,26 @@ export class Player extends Phaser.GameObjects.Sprite {
   }
 
   /** 
-   * @param {Phaser.Types.Input.Keyboard.CursorKeys}
+   * @param {GameScene} game
    */
-  update({ cursors, map, game, healthBar }) {
+  update(game) {
     if (this.state === 'moving' || this.state === 'attacking' || this.state === 'hurt') {
       return
     }
-    if (cursors.left.isDown || game.wasd.A.isDown) {
+    if (game.cursors.left.isDown || game.wasd.A.isDown) {
       this.direction = 'left'
-      this.moveToGrid(this.gridX - 1, this.gridY, map, game)
-    } else if (cursors.right.isDown || game.wasd.D.isDown) {
+      this.moveToGrid(this.gridX - 1, this.gridY, game.map, game)
+    } else if (game.cursors.right.isDown || game.wasd.D.isDown) {
       this.direction = 'right'
-      this.moveToGrid(this.gridX + 1, this.gridY, map, game)
-    } else if (cursors.down.isDown || game.wasd.S.isDown) {
+      this.moveToGrid(this.gridX + 1, this.gridY, game.map, game)
+    } else if (game.cursors.down.isDown || game.wasd.S.isDown) {
       this.direction = 'down'
-      this.moveToGrid(this.gridX, this.gridY + 1, map, game)
-    } else if (cursors.up.isDown || game.wasd.W.isDown) {
+      this.moveToGrid(this.gridX, this.gridY + 1, game.map, game)
+    } else if (game.cursors.up.isDown || game.wasd.W.isDown) {
       this.direction = 'up'
-      this.moveToGrid(this.gridX, this.gridY - 1, map, game)
-    } else if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
-      this.attack(map, game)
+      this.moveToGrid(this.gridX, this.gridY - 1, game.map, game)
+    } else if (Phaser.Input.Keyboard.JustDown(game.cursors.space)) {
+      this.attack(game.map, game, game.messageLog)
     } else {
       this.anims.play(`idle-${this.direction}`, true)
     }
@@ -252,12 +252,12 @@ export class Player extends Phaser.GameObjects.Sprite {
   * @param {GameMap} map
   * @param {GameScene} game
   */
-  attack(map, game) {
+  attack(map, game, messageLog) {
     this.state = 'attacking'
     let coords = this.getFacingCoords()
     const damage = 5 * this.strength
 
-    map.receiveAttack([coords], damage, game)
+    map.receiveAttack([coords], damage, game, this, messageLog)
     this.anims.play(`attack-${this.direction}`, true)
 
     this.once('animationcomplete', () => {
@@ -298,6 +298,7 @@ export class Player extends Phaser.GameObjects.Sprite {
       const mapIndex = game.map.entities.indexOf(this)
 
       game.map.entities.splice(mapIndex, 1)
+      game.messageLog.addMessage(`${this.name} has died!`)
       this.destroy()
     })
   }

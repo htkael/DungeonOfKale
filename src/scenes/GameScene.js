@@ -3,6 +3,7 @@ import { Player } from "../entities/Player";
 import { GameMap } from "../gameMap";
 import { NPC } from "../entities/NPC.js";
 import { HealthBar } from "../ui/HealthBar.js";
+import { MessageLog } from "../ui/MessageLog.js"
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -78,6 +79,7 @@ export class GameScene extends Phaser.Scene {
     this.loadGround()
     this.player = new Player(this, 12, 9, "Hunter", 100)
     this.healthBar = new HealthBar(this, 10, 10, 100, 25, this.player.health, this.player.maxHealth)
+    this.messageLog = new MessageLog(this, 10, 450, 5)
     this.cursors = this.input.keyboard.createCursorKeys()
     this.wasd = this.input.keyboard.addKeys({
       'W': Phaser.Input.Keyboard.KeyCodes.W,
@@ -85,14 +87,16 @@ export class GameScene extends Phaser.Scene {
       'A': Phaser.Input.Keyboard.KeyCodes.A,
       'D': Phaser.Input.Keyboard.KeyCodes.D
     })
-    this.npcs.push(new NPC(this, 12, 2, "Slime", 10, true, 20, 'slime-idle'))
+    this.npcs.push(new NPC(this, 12, 2, "Slime", 10, true, 2, 'slime-idle'))
+    this.npcs.push(new NPC(this, 20, 2, "Slime", 10, true, 2, 'slime-idle'))
+    this.npcs.push(new NPC(this, 5, 2, "Slime", 10, true, 2, 'slime-idle'))
     this.map = new GameMap(this.GRID_WIDTH, this.GRID_HEIGHT)
     this.map.entities.push(this.player)
     this.map.entities.push(...this.npcs)
   }
 
   update() {
-    this.player.update({ cursors: this.cursors, map: this.map, game: this })
+    this.player.update(this)
   }
 
   processTurn() {

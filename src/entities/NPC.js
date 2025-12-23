@@ -250,7 +250,7 @@ export class NPC extends Phaser.GameObjects.Sprite {
   }
 
   /**
-  * @param {GameMap} map
+  * @param {GameScene} game
   */
   attack(game) {
     this.state = 'attacking'
@@ -262,7 +262,7 @@ export class NPC extends Phaser.GameObjects.Sprite {
     ]
     const damage = 2 * this.strength
 
-    game.map.receiveAttack(coords, damage, game)
+    game.map.receiveAttack(coords, damage, game, this, game.messageLog)
     this.anims.play(`slime-attack-${this.direction}`, true)
     this.once('animationcomplete', () => {
       this.state = 'idle'
@@ -326,6 +326,7 @@ export class NPC extends Phaser.GameObjects.Sprite {
 
       game.npcs.splice(gameIndex, 1)
       game.map.entities.splice(mapIndex, 1)
+      game.messageLog.addMessage(`${this.name} has died!`)
       this.destroy()
     })
   }
