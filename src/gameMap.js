@@ -1,5 +1,7 @@
-import { Entity } from "./entities.js"
 import { Item } from "./items.js"
+import { NPC } from "./entities/NPC.js"
+import { Player } from "./entities/Player.js"
+import { GameScene } from "./scenes/GameScene.js"
 
 export class GameMap {
   /**
@@ -11,7 +13,7 @@ export class GameMap {
     this.width = width
     /** @type {number} */
     this.height = height
-    /** @type {Entity[]} */
+    /** @type {Player|NPC[]} */
     this.entities = []
     /** @type {Item[]} */
     this.items = []
@@ -29,19 +31,19 @@ export class GameMap {
   /**
    * @param {number} x
    * @param {number} y
-   * @returns {Entity[]}
+   * @returns {Player|NPC} 
   */
-  getEntitiesAt(x, y) {
-    return this.entities.filter(e => e.x === x && e.y === y)
+  getEntityAt(x, y) {
+    return this.entities.find(e => e.gridX === x && e.gridY === y)
   }
 
   /**
    * @param {number} x
    * @param {number} y
-   * @returns {Item[]}
+   * @returns {Item}
   */
-  getItemsAt(x, y) {
-    return this.items.filter(e => e.x === x && e.y === y)
+  getItemAt(x, y) {
+    return this.items.find(e => e.gridX === x && e.gridY === y)
   }
 
   /**
@@ -59,9 +61,36 @@ export class GameMap {
    * @returns {boolean}
   */
   hasObstacle(x, y) {
-    const entities = this.getEntitiesAt(x, y)
-    const items = this.getItemsAt(x, y)
-    const npcs = entities.filter(npc => npc.isAlive())
-    return npcs.length > 0 || items.length > 0
+    const entity = this.getEntityAt(x, y)
+    return entity
+  }
+
+  /**
+   * @param {number} amount
+   * @param {GameScene} game
+  */
+  receiveAttack(coords, amount, game) {
+    for (let i = 0; i < coords.length; i++) {
+      /** @type {Player|NPC}*/
+      const attacked = this.getEntityAt(coords[i].x, coords[i].y)
+      if (attacked && typeof attacked?.takeDamage === 'function') {
+        attacked.takeDamage(amount, game)
+      }
+    }
+  }
+
+  /**
+  * @param {Player} player
+  */
+  pickUpItem(coords, player) {
+    const item = this.getItemAt(coords.x, coords.y)
+    if (item) {
+      player.inventory.push(item)
+      const index = this.items.indexOf(item)
+      this.items.splice(index, 1)
+      return true
+    } else {
+      return false
+    }
   }
 }
