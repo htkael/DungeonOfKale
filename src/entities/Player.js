@@ -165,20 +165,20 @@ export class Player extends Phaser.GameObjects.Sprite {
   /** 
    * @param {Phaser.Types.Input.Keyboard.CursorKeys}
    */
-  update({ cursors, map, game }) {
+  update({ cursors, map, game, healthBar }) {
     if (this.state === 'moving' || this.state === 'attacking' || this.state === 'hurt') {
       return
     }
-    if (cursors.left.isDown) {
+    if (cursors.left.isDown || game.wasd.A.isDown) {
       this.direction = 'left'
       this.moveToGrid(this.gridX - 1, this.gridY, map, game)
-    } else if (cursors.right.isDown) {
+    } else if (cursors.right.isDown || game.wasd.D.isDown) {
       this.direction = 'right'
       this.moveToGrid(this.gridX + 1, this.gridY, map, game)
-    } else if (cursors.down.isDown) {
+    } else if (cursors.down.isDown || game.wasd.S.isDown) {
       this.direction = 'down'
       this.moveToGrid(this.gridX, this.gridY + 1, map, game)
-    } else if (cursors.up.isDown) {
+    } else if (cursors.up.isDown || game.wasd.W.isDown) {
       this.direction = 'up'
       this.moveToGrid(this.gridX, this.gridY - 1, map, game)
     } else if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
@@ -238,12 +238,12 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.state = 'hurt'
     this.health -= amount
     this.anims.play(`player-hurt-${this.direction}`, true)
-    console.log("getting hurt", { direction: this.direction })
     if (this.health <= 0) {
       this.die(game)
     } else {
       this.once('animationcomplete', () => {
         this.state = 'idle'
+        game.healthBar.update(this)
       })
     }
   }
@@ -295,7 +295,6 @@ export class Player extends Phaser.GameObjects.Sprite {
   die(game) {
     this.anims.play(`player-death-${this.direction}`)
     this.once('animationcomplete', () => {
-      game.player = null
       const mapIndex = game.map.entities.indexOf(this)
 
       game.map.entities.splice(mapIndex, 1)

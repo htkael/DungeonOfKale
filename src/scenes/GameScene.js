@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { Player } from "../entities/Player";
 import { GameMap } from "../gameMap";
 import { NPC } from "../entities/NPC.js";
+import { HealthBar } from "../ui/HealthBar.js";
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -76,8 +77,15 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.loadGround()
     this.player = new Player(this, 12, 9, "Hunter", 100)
+    this.healthBar = new HealthBar(this, 10, 10, 100, 25, this.player.health, this.player.maxHealth)
     this.cursors = this.input.keyboard.createCursorKeys()
-    this.npcs.push(new NPC(this, 12, 2, "Slime", 10, true, 1, 'slime-idle'))
+    this.wasd = this.input.keyboard.addKeys({
+      'W': Phaser.Input.Keyboard.KeyCodes.W,
+      'S': Phaser.Input.Keyboard.KeyCodes.S,
+      'A': Phaser.Input.Keyboard.KeyCodes.A,
+      'D': Phaser.Input.Keyboard.KeyCodes.D
+    })
+    this.npcs.push(new NPC(this, 12, 2, "Slime", 10, true, 20, 'slime-idle'))
     this.map = new GameMap(this.GRID_WIDTH, this.GRID_HEIGHT)
     this.map.entities.push(this.player)
     this.map.entities.push(...this.npcs)
