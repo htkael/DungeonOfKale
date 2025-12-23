@@ -1,10 +1,14 @@
 import Phaser from "phaser"
 import { GameScene } from "./scenes/GameScene"
+import { PHASER_HEIGHT, PHASER_WIDTH } from "./constants"
 
 const config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 608,
+  width: PHASER_WIDTH,
+  height: PHASER_HEIGHT,
+  scale: {
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
   physics: {
     default: 'arcade',
     arcade: {

@@ -3,7 +3,7 @@ import { GameScene } from "../scenes/GameScene"
 
 export class HealthBar extends Phaser.GameObjects.Container {
 
-  constructor(scene, x, y, width, height, currentHealth, maxHealth) {
+  constructor(scene, x, y, width, height, currentHealth, maxHealth, showText = true, fontSize = '14px') {
     /**
     * @param {GameScene} scene
     * @param {number} x
@@ -22,9 +22,11 @@ export class HealthBar extends Phaser.GameObjects.Container {
     this.maxHealth = maxHealth
     /** @type {number} */
     this.currentHealth = currentHealth
+    /** @type {boolean} */
+    this.showText = showText
     this.bar = new Phaser.GameObjects.Graphics(scene)
     this.add(this.bar)
-    this.text = new Phaser.GameObjects.Text(this.scene, 0, 30, `HP: 100/100`, { fontSize: '14px', color: "#000000", fontFamily: 'Arial', fontStyle: 'bold' })
+    this.text = new Phaser.GameObjects.Text(this.scene, 0, 30, `HP: 100/100`, { fontSize: showText ? fontSize : '0px', color: "#000000", fontFamily: 'Arial', fontStyle: 'bold' })
     this.add(this.text)
 
     scene.add.existing(this)

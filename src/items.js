@@ -1,4 +1,4 @@
-import { Player } from "./entities.js"
+//import { Player } from "./entities.js"
 
 export class Item {
   /**

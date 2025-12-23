@@ -4,6 +4,7 @@ import { GameMap } from "../gameMap";
 import { NPC } from "../entities/NPC.js";
 import { HealthBar } from "../ui/HealthBar.js";
 import { MessageLog } from "../ui/MessageLog.js"
+import { PHASER_HEIGHT, PHASER_WIDTH } from "../constants.js";
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -15,9 +16,9 @@ export class GameScene extends Phaser.Scene {
     /** @type {number}*/
     this.TILE_SIZE = 32
     /** @type {number}*/
-    this.GRID_WIDTH = 25
+    this.GRID_WIDTH = (PHASER_WIDTH / this.TILE_SIZE)
     /** @type {number}*/
-    this.GRID_HEIGHT = 19
+    this.GRID_HEIGHT = (PHASER_HEIGHT / this.TILE_SIZE)
     /** @type {number}*/
     this.floor = 1
     /** @type {string} */
@@ -78,8 +79,6 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.loadGround()
     this.player = new Player(this, 12, 9, "Hunter", 100)
-    this.healthBar = new HealthBar(this, 10, 10, 100, 25, this.player.health, this.player.maxHealth)
-    this.messageLog = new MessageLog(this, 10, 450, 5)
     this.cursors = this.input.keyboard.createCursorKeys()
     this.wasd = this.input.keyboard.addKeys({
       'W': Phaser.Input.Keyboard.KeyCodes.W,
@@ -93,6 +92,9 @@ export class GameScene extends Phaser.Scene {
     this.map = new GameMap(this.GRID_WIDTH, this.GRID_HEIGHT)
     this.map.entities.push(this.player)
     this.map.entities.push(...this.npcs)
+
+    this.healthBar = new HealthBar(this, 10, 10, 100, 25, this.player.health, this.player.maxHealth)
+    this.messageLog = new MessageLog(this, 10, PHASER_HEIGHT - 158, 5)
   }
 
   update() {

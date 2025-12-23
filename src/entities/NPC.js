@@ -1,8 +1,9 @@
 import { Player } from "./Player.js"
 import { GameMap } from "../gameMap"
 import { GameScene } from "../scenes/GameScene"
+import { HealthBar } from "../ui/HealthBar.js"
 
-export class NPC extends Phaser.GameObjects.Sprite {
+export class NPC extends Phaser.GameObjects.Container {
   /**
   * @param {GameScene} scene
   * @param {number} gridX
@@ -14,7 +15,12 @@ export class NPC extends Phaser.GameObjects.Sprite {
   * @param {string} sprite
   */
   constructor(scene, gridX, gridY, name, health, hostile, strength, sprite = 'slime-idle') {
-    super(scene, scene.gridToPixel(gridX, gridY).x, scene.gridToPixel(gridX, gridY).y, sprite)
+    super(scene, scene.gridToPixel(gridX, gridY).x, scene.gridToPixel(gridX, gridY).y)
+
+    this.sprite = new Phaser.GameObjects.Sprite(scene, 0, 0, sprite)
+    this.healthBar = new HealthBar(scene, -15, -25, 30, 10, health, health, false, '0px')
+    this.add(this.sprite)
+    this.add(this.healthBar)
 
     scene.add.existing(this)
     scene.physics.add.existing(this)
@@ -23,7 +29,7 @@ export class NPC extends Phaser.GameObjects.Sprite {
     this.gridY = gridY
     this.setScale(1.2)
     this.createAnimations()
-    this.anims.play('slime-idle-down')
+    this.sprite.anims.play('slime-idle-down')
     /** @type {string} */
     this.direction = 'down'
     /** @type{number} */
@@ -38,8 +44,6 @@ export class NPC extends Phaser.GameObjects.Sprite {
     this.strength = strength
     /** @type {string} */
     this.state = 'idle'
-    /** @type {string} */
-    this.sprite = sprite
   }
 
   createAnimations() {
@@ -187,7 +191,7 @@ export class NPC extends Phaser.GameObjects.Sprite {
       if (ran > 0.2) {
         this.wander(game.map)
       } else {
-        this.anims.play(`slime-idle-${this.direction}`, true)
+        this.sprite.anims.play(`slime-idle-${this.direction}`, true)
       }
     }
   }
@@ -212,14 +216,14 @@ export class NPC extends Phaser.GameObjects.Sprite {
   tweenToGridPosition() {
     this.state = 'moving'
     const pos = this.scene.gridToPixel(this.gridX, this.gridY)
-    this.anims.play(`slime-walk-${this.direction}`, true)
+    this.sprite.anims.play(`slime-walk-${this.direction}`, true)
     this.scene.tweens.add({
       targets: this,
       x: pos.x,
       y: pos.y,
       duration: 200,
       onComplete: () => {
-        this.anims.play(`slime-idle-${this.direction}`, true)
+        this.sprite.anims.play(`slime-idle-${this.direction}`, true)
         this.state = 'idle'
       }
     })
@@ -239,12 +243,13 @@ export class NPC extends Phaser.GameObjects.Sprite {
   */
   takeDamage(amount, game) {
     this.health -= amount
-    this.anims.play(`slime-hurt-${this.direction}`, true)
+    this.sprite.anims.play(`slime-hurt-${this.direction}`, true)
     if (this.health <= 0) {
       this.die(game)
     } else {
-      this.once('animationcomplete', () => {
-        this.anims.play(`slime-idle-${this.direction}`, true)
+      this.sprite.once('animationcomplete', () => {
+        this.sprite.anims.play(`slime-idle-${this.direction}`, true)
+        this.healthBar.update(this)
       })
     }
   }
@@ -263,10 +268,10 @@ export class NPC extends Phaser.GameObjects.Sprite {
     const damage = 2 * this.strength
 
     game.map.receiveAttack(coords, damage, game, this, game.messageLog)
-    this.anims.play(`slime-attack-${this.direction}`, true)
-    this.once('animationcomplete', () => {
+    this.sprite.anims.play(`slime-attack-${this.direction}`, true)
+    this.sprite.once('animationcomplete', () => {
       this.state = 'idle'
-      this.anims.play(`slime-idle-${this.direction}`)
+      this.sprite.anims.play(`slime-idle-${this.direction}`)
     })
   }
 
@@ -319,8 +324,8 @@ export class NPC extends Phaser.GameObjects.Sprite {
   * @param {GameScene} game
   */
   die(game) {
-    this.anims.play(`slime-death-${this.direction}`)
-    this.once('animationcomplete', () => {
+    this.sprite.anims.play(`slime-death-${this.direction}`)
+    this.sprite.once('animationcomplete', () => {
       const gameIndex = game.npcs.indexOf(this)
       const mapIndex = game.map.entities.indexOf(this)
 
